@@ -12,8 +12,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://cars-doctor-1b557.web.app",
-      "https://cars-doctor-1b557.firebaseapp.com",
+      // "https://cars-doctor-1b557.web.app",
+      // "https://cars-doctor-1b557.firebaseapp.com",
     ],
     credentials: true,
   })
@@ -88,7 +88,18 @@ async function run() {
 
     // service api
     app.get("/services", async (req, res) => {
-      const cursor = serviceCollection.find();
+      const filter = req.query;
+      console.log(filter);
+      const query = {
+        // price: {$gt: 100}
+        title: { $regex: filter.search, $options: "i" },
+      };
+      const options = {
+        sort: {
+          price: filter.sort === "asc" ? 1 : -1,
+        },
+      };
+      const cursor = serviceCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
